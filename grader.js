@@ -45,8 +45,8 @@ var assertUrlExists = function(infile) {
 //        console.log("%s does not exist. Exiting.", instr);
 //        process.exit(1); // http://nodejs.org/api/process.html#process_process_exit_code
 //    }
-		console.error("assertUrlExists returning: " + instr);
-    return 'http://www.facebook.com'; //instr;
+//		console.error("assertUrlExists returning: " + instr);
+    return instr;
 };
 
 var loadChecks = function(checksfile) {
@@ -72,7 +72,7 @@ var buildHtmlFunction = function() {
 };
 
 var cheerioUrl = function(urlPath) {
-	console.error("urlPath: " + urlPath);
+	//console.error("urlPath: " + urlPath);
 	//return;
 	var rest = require('restler');
 	var response2console = buildUrlfn();
@@ -89,8 +89,9 @@ var buildUrlfn = function() {
 				console.error('Error: ' + util.format(response.message));
 				return;
 			}
-			console.log("buildUrlFn");
-    	outputToConsole(response);
+			//console.log("buildUrlFn");
+			//console.error(result);
+    	outputToConsole(result);
 	//    return out;
 		};
 		return response2console;
@@ -105,7 +106,7 @@ var outputToConsole = function(stringOut) {
 	    var out = {};
 	    for(var ii in checks) {
 	        var present = $(checks[ii]).length > 0;
-	    		//console.error("ii: " + ii + " present: " + present + " checks[ii]: " + checks[ii]);
+//	    		console.error("ii: " + ii + " present: " + present + " checks[ii]: " + checks[ii]);
 	        out[checks[ii]] = present;
 	    }
 
@@ -120,18 +121,11 @@ var checksFile;
 
 var checkHtmlFile = function(htmlfile, checksfile) {
 		if (program.url!=undefined) { 
-			//console.error("SDFSDFSDF");
-			$ = cheerioUrl(htmlfile);
+			cheerioUrl(htmlfile);
 		} else {
-	    $ = cheerioHtmlFile(htmlfile);
+	    cheerioHtmlFile(htmlfile);
  		}
 		checksFile = loadChecks(checksfile).sort();
-//    var out = {};
-//    for(var ii in checks) {
-//        var present = $(checks[ii]).length > 0;
-//        out[checks[ii]] = present;
-//    }
-//    return out;
 };
 
 var getUrl = function(urlPath) {
@@ -149,28 +143,16 @@ var clone = function(fn) {
 
 if(require.main == module) {
     program
-        .option('-u, --url <url_file>', 'Path to url', clone(assertUrlExists), 'http://www.stuff.co.nz')
-        .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
-        .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
+        .option('-u, --url [url_file]', 'Path to url', clone(assertUrlExists))
+        .option('-c, --checks [check_file]', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
+        .option('-f, --file [html_file]', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
         .parse(process.argv);
 
-		//console.error("file: " + program.file);
-		//console.error("checks: " + program.checks);
-		console.error("Program Url: " + program.url);
-		console.error("Test: " + program.test);
-		console.error("Program.url == undefined?: " + (program.url==undefined));
-    if (program.url!=undefined) {
-//	  	var checkJson = checkHtmlFile(program.url, program.checks);
-			console.error("checkHTMLFile(url)");
+    if (program.url) {
 			checkHtmlFile(program.url, program.checks);
     } else {
-//    	var checkJson = checkHtmlFile(program.file, program.checks);
-    	//console.error("checkHTMLFile(file)");
     	checkHtmlFile(program.file, program.checks);
     }
-//    var outJson = JSON.stringify(checkJson, null, 4);
-//    console.log("outJson");
-//    console.log(outJson);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
 }
